@@ -1,11 +1,11 @@
 {
   "name": "maker-esm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Forta Agents for monitoring MakerDAO Emergency shutdown",
   "chainIds": [
     1
   ],
-  "repository": "https://github.com/NethermindEth/Forta-Agents/tree/main/Maker-Agents-Suit-Module/ESMAgent",
+  "repository": "https://github.com/makerdao-is/Forta-Agents/tree/main/Maker-Agents/ESMAgent",
   "scripts": {
     "build": "tsc",
     "start": "npm run start:dev",

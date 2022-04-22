@@ -4,6 +4,8 @@ import { CHAINLOG_ADDRESS, UPDATE_ADDR_ABI } from "./utils";
 import AddressFetcher from "./address.fetcher";
 import provideESMJoinEventAgent from "./join.event";
 import provideESMFireEventAgent from "./fire.event";
+import provideDenyFunctionHandler from "./deny.function";
+import provideRelyFunctionHandler from "./rely.function";
 
 const ESM_FETCHER: AddressFetcher = new AddressFetcher(getEthersProvider(), CHAINLOG_ADDRESS);
 
@@ -22,6 +24,8 @@ const provideAgentHandler = (
 ): HandleTransaction => {
   const joinEventHandler = provideESMJoinEventAgent(joinEvent, fetcher);
   const fireEventHandler = provideESMFireEventAgent(fireEvent, fetcher);
+  const denyFunctionHandler = provideDenyFunctionHandler(fetcher);
+  const relyFunctionHandler = provideRelyFunctionHandler(fetcher);
 
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
     let findings: Finding[] = [];
@@ -33,7 +37,10 @@ const provideAgentHandler = (
       }
     });
 
-    findings = [...(await joinEventHandler(txEvent)), ...(await fireEventHandler(txEvent))];
+    findings = [...(await joinEventHandler(txEvent)),
+                ...(await fireEventHandler(txEvent)),
+                ...(await denyFunctionHandler(txEvent)),
+                ...(await relyFunctionHandler(txEvent))];
 
     return findings;
   };

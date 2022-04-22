@@ -6,3 +6,6 @@ export const UPDATE_ADDR_ABI: string = "event UpdateAddress(bytes32 key, address
 export const UPDATE_ADDR_SIG: string = "UpdateAddress(bytes32,address)";
 export const CHAINLOG_IFACE: utils.Interface = new utils.Interface([CHAINLOG_ABI]);
 export const ESM_KEY_BYTES: string = utils.formatBytes32String("MCD_ESM");
+
+export const RELY_FUNCTION_SIG = "function rely(address)";
+export const DENY_FUNCTION_SIG = "function deny(address)";
