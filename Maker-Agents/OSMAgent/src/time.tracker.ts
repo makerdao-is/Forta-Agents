@@ -46,9 +46,9 @@ export default class TimeTracker {
   }
 
   updateHour(timestamp: number): void {
-    if (this.hour === -1) {
-      this.firstHour = this.getHour(timestamp);
-    }
     this.hour = this.getHour(timestamp);
+    if (this.firstHour === -1) {
+      this.firstHour = this.hour;
+    }
   }
 }
