@@ -14,8 +14,7 @@ export const RELY_FUNCTION_SIG = "function rely(address)";
 
 export const DENY_FUNCTION_SIG = "function deny(address)";
 
-// https://discord.com/channels/893112320329396265/897504552436260955/951918347187015710
-export const MEGAPOKER_CONTRACT = "0x70098F537EE8D0E00882585b7B02C45cd6AB3186";
+export const MEGAPOKER_CONTRACT = "0x27a25935D8b0006A97E11cAdDc2b3bf3a6721c13";
 export const POKE_FUNCTION_SIG = "function poke()";
 
 export const PEEK_FUNCTION_SELECTOR = "0x59e02dd7";
