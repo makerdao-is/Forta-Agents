@@ -46,6 +46,11 @@ export default class TimeTracker {
   }
 
   updateHour(timestamp: number): void {
+    if (this.isDifferentHour(timestamp)) {
+      this.updateFindingReport(false);
+      this.updateFunctionWasCalled(false);
+    }
+
     this.hour = this.getHour(timestamp);
     if (this.firstHour === -1) {
       this.firstHour = this.hour;

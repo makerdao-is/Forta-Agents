@@ -1,7 +1,8 @@
-import { Finding, HandleTransaction } from "forta-agent";
-import { provideAgentHandler } from "./agent";
-import { createAddress, TestTransactionEvent } from "forta-agent-tools/lib/tests";
+import { Finding, HandleTransaction, HandleBlock } from "forta-agent";
+import { provideHandleTxn, provideHandleBlock } from "./agent";
+import { createAddress, TestTransactionEvent, TestBlockEvent } from "forta-agent-tools/lib/tests";
 import { createFinding as deviationFinding } from "./big.queued.price.deviation";
+import TimeTracker from "./time.tracker";
 import { createFinding as priceUpdateFinding } from "./price.update.check";
 import { createFinding as relyFinding } from "./rely.function.spec";
 import { createFinding as denyFinding } from "./deny.function.spec";
@@ -36,7 +37,9 @@ const relyIface = new utils.Interface([RELY_FUNCTION_SIG]);
 const denyIface = new utils.Interface([DENY_FUNCTION_SIG]);
 
 describe("OSM Agent Test Suite", () => {
+  let timeTracker: TimeTracker;
   let transactionHandler: HandleTransaction;
+  let blockHandler: HandleBlock;
   let mockFetcher: any;
   let updateAddresses = jest.fn();
   let getOsmAddresses = jest.fn();
@@ -48,7 +51,9 @@ describe("OSM Agent Test Suite", () => {
     };
   });
   beforeEach(() => {
-    transactionHandler = provideAgentHandler(mockFetcher);
+    timeTracker = new TimeTracker();
+    transactionHandler = provideHandleTxn(mockFetcher, timeTracker);
+    blockHandler = provideHandleBlock(timeTracker);
   });
 
   it("should return empty findings is not expected events happens", async () => {
@@ -66,7 +71,9 @@ describe("OSM Agent Test Suite", () => {
     const log = logIface.encodeEventLog(logIface.getEvent("LogValue"), [defaultAbiCoder.encode(["uint256"], [100])]);
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
+    const blockEvent1 = new TestBlockEvent().setTimestamp(previousHourForActivatingAgent);
     const txEvent2 = new TestTransactionEvent().setTimestamp(lessThanTenMinutes);
+    const blockEvent2 = new TestBlockEvent().setTimestamp(lessThanTenMinutes);
     const txEvent3 = new TestTransactionEvent()
       .setTimestamp(greaterThanTenMinutes)
       .addTraces({
@@ -75,10 +82,14 @@ describe("OSM Agent Test Suite", () => {
         output: peek_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [107]), true]),
       })
       .addAnonymousEventLog(CONTRACTS.get("PIP_TWO") as string, log.data, ...log.topics);
+    const blockEvent3 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
     findings = findings.concat(await transactionHandler(txEvent1));
+    findings = findings.concat(await blockHandler(blockEvent1));
     findings = findings.concat(await transactionHandler(txEvent2));
+    findings = findings.concat(await blockHandler(blockEvent2));
     findings = findings.concat(await transactionHandler(txEvent3));
+    findings = findings.concat(await blockHandler(blockEvent3));
 
     expect(findings).toStrictEqual([
       deviationFinding(CONTRACTS.get("PIP_TWO") as string, 100, 107),
@@ -130,10 +141,14 @@ describe("OSM Agent Test Suite", () => {
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
+    const blockEvent1 = new TestBlockEvent().setTimestamp(previousHourForActivatingAgent);
     const txEvent2 = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
+    const blockEvent2 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
     findings = findings.concat(await transactionHandler(txEvent1));
+    findings = findings.concat(await blockHandler(blockEvent1));
     findings = findings.concat(await transactionHandler(txEvent2));
+    findings = findings.concat(await blockHandler(blockEvent2));
 
     expect(findings).toStrictEqual([priceUpdateFinding()]);
   });

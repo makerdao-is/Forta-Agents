@@ -1,24 +1,28 @@
-import { Finding, getEthersProvider, HandleTransaction, TransactionEvent } from "forta-agent";
+import { Finding, getEthersProvider, HandleTransaction, HandleBlock,
+         TransactionEvent, BlockEvent } from "forta-agent";
 import provideDenyFunctionHandler from "./deny.function";
 import provideRelyFunctionHandler from "./rely.function";
+import TimeTracker from "./time.tracker";
 import provideBigQueuedPriceDeviationHandler from "./big.queued.price.deviation";
-import providePriceUpdateCheckHandler from "./price.update.check";
+import { providePriceUpdateCheckHandler, providePriceLateChecker } from "./price.update.check";
 import AddressesFetcher from "./addresses.fetcher";
 import { CHAIN_LOG, EVENTS_ABIS } from "./utils";
 import { parseBytes32String } from "ethers/lib/utils";
 
 let FETCHER: AddressesFetcher = new AddressesFetcher(getEthersProvider(), CHAIN_LOG);
+let TIMETRACKER: TimeTracker = new TimeTracker();
 
 export const initialize = (fetcher: AddressesFetcher) => async () => {
   // fetch OSM addresses from the ChainLog contract.
   await fetcher.getOsmAddresses("latest");
 };
 
-export const provideAgentHandler = (fetcher: AddressesFetcher): HandleTransaction => {
+export const provideHandleTxn = (fetcher: AddressesFetcher,
+                                    timeTracker: TimeTracker): HandleTransaction => {
   const bigDeviationNextPriceHandler: HandleTransaction = provideBigQueuedPriceDeviationHandler(fetcher);
   const denyFunctionHandler: HandleTransaction = provideDenyFunctionHandler(fetcher);
   const relyFunctionHandler: HandleTransaction = provideRelyFunctionHandler(fetcher);
-  const priceUpdateCheckHandler: HandleTransaction = providePriceUpdateCheckHandler();
+  const priceUpdateCheckHandler: HandleTransaction = providePriceUpdateCheckHandler(timeTracker);
 
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
     let findings: Finding[] = [];
@@ -38,7 +42,15 @@ export const provideAgentHandler = (fetcher: AddressesFetcher): HandleTransactio
   };
 };
 
+export const provideHandleBlock = (timeTracker: TimeTracker): HandleBlock => {
+  return async (blockEvent: BlockEvent): Promise<Finding[]> => {
+    const handler: HandleBlock = providePriceLateChecker(timeTracker);
+    return handler(blockEvent);
+  };
+};
+
 export default {
   initialize: initialize(FETCHER),
-  handleTransaction: provideAgentHandler(FETCHER),
+  handleTransaction: provideHandleTxn(FETCHER, TIMETRACKER),
+  handleBlock: provideHandleBlock(TIMETRACKER),
 };

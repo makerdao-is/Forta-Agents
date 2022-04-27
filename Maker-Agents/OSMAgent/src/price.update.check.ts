@@ -1,4 +1,5 @@
-import { Finding, HandleTransaction, TransactionEvent, FindingSeverity, FindingType } from "forta-agent";
+import { Finding, HandleTransaction, TransactionEvent, HandleBlock, BlockEvent,
+         FindingSeverity, FindingType } from "forta-agent";
 import TimeTracker from "./time.tracker";
 import { MEGAPOKER_CONTRACT, POKE_FUNCTION_SIG } from "./utils";
 
@@ -16,17 +17,11 @@ export const createFinding = (): Finding => {
   });
 };
 
-export default function providePriceUpdateCheckHandler(): HandleTransaction {
-  const timeTracker = new TimeTracker();
-
+export function providePriceUpdateCheckHandler(timeTracker: TimeTracker): HandleTransaction {
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
-    let findings: Finding[] = [];
     const timestamp = txEvent.block.timestamp;
 
-    if (timeTracker.isDifferentHour(timestamp)) {
-      timeTracker.updateFindingReport(false);
-      timeTracker.updateFunctionWasCalled(false);
-    }
+    timeTracker.updateHour(timestamp);
 
     if (
       txEvent.filterFunction(POKE_FUNCTION_SIG, MEGAPOKER_CONTRACT).length !== 0 &&
@@ -34,6 +29,15 @@ export default function providePriceUpdateCheckHandler(): HandleTransaction {
     ) {
       timeTracker.updateFunctionWasCalled(true);
     }
+
+    return [];
+  };
+};
+
+export function providePriceLateChecker(timeTracker: TimeTracker): HandleBlock {
+  return async (blockEvent: BlockEvent): Promise<Finding[]> => {
+    let findings: Finding[] = [];
+    const timestamp = blockEvent.block.timestamp;
 
     if (
       !timeTracker.isInFirstTenMins(timestamp) &&
@@ -45,7 +49,6 @@ export default function providePriceUpdateCheckHandler(): HandleTransaction {
       findings.push(createFinding());
     }
 
-    timeTracker.updateHour(timestamp);
     return findings;
   };
-}
+};
