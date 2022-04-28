@@ -21,11 +21,9 @@ export function providePriceUpdateCheckHandler(timeTracker: TimeTracker): Handle
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
     const timestamp = txEvent.block.timestamp;
 
-    timeTracker.updateHour(timestamp);
-
     if (
-      txEvent.filterFunction(POKE_FUNCTION_SIG, MEGAPOKER_CONTRACT).length !== 0 &&
-      timeTracker.isInFirstTenMins(timestamp)
+      timeTracker.isInFirstTenMins(timestamp) &&
+      txEvent.filterFunction(POKE_FUNCTION_SIG, MEGAPOKER_CONTRACT).length !== 0
     ) {
       timeTracker.updateFunctionWasCalled(true);
     }
@@ -38,6 +36,8 @@ export function providePriceLateChecker(timeTracker: TimeTracker): HandleBlock {
   return async (blockEvent: BlockEvent): Promise<Finding[]> => {
     let findings: Finding[] = [];
     const timestamp = blockEvent.block.timestamp;
+
+    timeTracker.updateHour(timestamp);
 
     if (
       !timeTracker.isInFirstTenMins(timestamp) &&

@@ -1,8 +1,8 @@
-import { Finding, HandleTransaction, HandleBlock } from "forta-agent";
+import { Finding } from "forta-agent";
 import TimeTracker from "./time.tracker";
 import { providePriceUpdateCheckHandler, providePriceLateChecker, createFinding } from "./price.update.check";
 
-import { TestTransactionEvent, TestBlockEvent } from "forta-agent-tools/lib/tests";
+import { Agent, runBlock, TestTransactionEvent, TestBlockEvent } from "forta-agent-tools/lib/tests";
 import { MEGAPOKER_CONTRACT } from "./utils";
 
 const pokeFunctionSelector = "0x18178358";
@@ -13,13 +13,14 @@ const differentHour = 1467032181; // "Mon, 27 Jun 2016 12:56:21 GMT"
 
 describe("Poker Method", () => {
   let timeTracker: TimeTracker;
-  let handleBlock: HandleBlock;
-  let handleTransaction: HandleTransaction;
+  let agent: Agent;
 
   beforeEach(() => {
     timeTracker = new TimeTracker();
-    handleBlock = providePriceLateChecker(timeTracker);
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
+    agent = {
+      handleBlock: providePriceLateChecker(timeTracker),
+      handleTransaction: providePriceUpdateCheckHandler(timeTracker),
+    };
   });
 
   it("should returns empty findings in the first hour", async () => {
@@ -28,8 +29,7 @@ describe("Poker Method", () => {
     const txEvent = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
     const blockEvent = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
-    findings = findings.concat(await handleTransaction(txEvent));
-    findings = findings.concat(await handleBlock(blockEvent));
+    findings = findings.concat(await runBlock(agent, blockEvent, txEvent));
 
     expect(findings).toStrictEqual([]);
   });
@@ -42,10 +42,8 @@ describe("Poker Method", () => {
     const txEvent2 = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
     const blockEvent2 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
-    findings = findings.concat(await handleTransaction(txEvent1));
-    findings = findings.concat(await handleBlock(blockEvent1));
-    findings = findings.concat(await handleTransaction(txEvent2));
-    findings = findings.concat(await handleBlock(blockEvent2));
+    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
+    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
 
     expect(findings).toStrictEqual([]);
   });
@@ -62,12 +60,9 @@ describe("Poker Method", () => {
     const txEvent3 = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
     const blockEvent3 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
-    findings = findings.concat(await handleTransaction(txEvent1));
-    findings = findings.concat(await handleBlock(blockEvent1));
-    findings = findings.concat(await handleTransaction(txEvent2));
-    findings = findings.concat(await handleBlock(blockEvent2));
-    findings = findings.concat(await handleTransaction(txEvent3));
-    findings = findings.concat(await handleBlock(blockEvent3));
+    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
+    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
+    findings = findings.concat(await runBlock(agent, blockEvent3, txEvent3));
 
     expect(findings).toStrictEqual([]);
   });
@@ -82,12 +77,9 @@ describe("Poker Method", () => {
     const txEvent3 = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
     const blockEvent3 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
-    findings = findings.concat(await handleTransaction(txEvent1));
-    findings = findings.concat(await handleBlock(blockEvent1));
-    findings = findings.concat(await handleTransaction(txEvent2));
-    findings = findings.concat(await handleBlock(blockEvent2));
-    findings = findings.concat(await handleTransaction(txEvent3));
-    findings = findings.concat(await handleBlock(blockEvent3));
+    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
+    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
+    findings = findings.concat(await runBlock(agent, blockEvent3, txEvent3));
 
     expect(findings).toStrictEqual([createFinding()]);
   });
@@ -104,12 +96,9 @@ describe("Poker Method", () => {
       .setTimestamp(greaterThanTenMinutes);
     const blockEvent3 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
-    findings = findings.concat(await handleTransaction(txEvent1));
-    findings = findings.concat(await handleBlock(blockEvent1));
-    findings = findings.concat(await handleTransaction(txEvent2));
-    findings = findings.concat(await handleBlock(blockEvent2));
-    findings = findings.concat(await handleTransaction(txEvent3));
-    findings = findings.concat(await handleBlock(blockEvent3));
+    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
+    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
+    findings = findings.concat(await runBlock(agent, blockEvent3, txEvent3));
 
     expect(findings).toStrictEqual([createFinding()]);
   });
@@ -128,14 +117,10 @@ describe("Poker Method", () => {
     const txEvent4 = new TestTransactionEvent().setTimestamp(differentHour);
     const blockEvent4 = new TestBlockEvent().setTimestamp(differentHour);
 
-    findings = findings.concat(await handleTransaction(txEvent1));
-    findings = findings.concat(await handleBlock(blockEvent1));
-    findings = findings.concat(await handleTransaction(txEvent2));
-    findings = findings.concat(await handleBlock(blockEvent2));
-    findings = findings.concat(await handleTransaction(txEvent3));
-    findings = findings.concat(await handleBlock(blockEvent3));
-    findings = findings.concat(await handleTransaction(txEvent4));
-    findings = findings.concat(await handleBlock(blockEvent4));
+    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
+    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
+    findings = findings.concat(await runBlock(agent, blockEvent3, txEvent3));
+    findings = findings.concat(await runBlock(agent, blockEvent4, txEvent4));
 
     expect(findings).toStrictEqual([createFinding(), createFinding()]);
   });
@@ -150,12 +135,9 @@ describe("Poker Method", () => {
     const txEvent3 = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
     const blockEvent3 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
-    findings = findings.concat(await handleTransaction(txEvent1));
-    findings = findings.concat(await handleBlock(blockEvent1));
-    findings = findings.concat(await handleTransaction(txEvent2));
-    findings = findings.concat(await handleBlock(blockEvent2));
-    findings = findings.concat(await handleTransaction(txEvent3));
-    findings = findings.concat(await handleBlock(blockEvent3));
+    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
+    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
+    findings = findings.concat(await runBlock(agent, blockEvent3, txEvent3));
 
     expect(findings).toStrictEqual([createFinding()]);
   });
