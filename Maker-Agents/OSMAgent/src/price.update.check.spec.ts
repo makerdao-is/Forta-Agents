@@ -26,10 +26,10 @@ describe("Poker Method", () => {
   it("should returns empty findings in the first hour", async () => {
     let findings: Finding[] = [];
 
-    const txEvent = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
-    const blockEvent = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
-
-    findings = findings.concat(await runBlock(agent, blockEvent, txEvent));
+    findings = findings.concat(await runBlock(
+      agent,
+      new TestBlockEvent().setTimestamp(greaterThanTenMinutes),
+      new TestTransactionEvent().setTimestamp(greaterThanTenMinutes)));
 
     expect(findings).toStrictEqual([]);
   });
@@ -37,13 +37,14 @@ describe("Poker Method", () => {
   it("should returns empty findings in the first hour", async () => {
     let findings: Finding[] = [];
 
-    const txEvent1 = new TestTransactionEvent().setTimestamp(lessThanTenMinutes);
-    const blockEvent1 = new TestBlockEvent().setTimestamp(lessThanTenMinutes);
-    const txEvent2 = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
-    const blockEvent2 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
-
-    findings = findings.concat(await runBlock(agent, blockEvent1, txEvent1));
-    findings = findings.concat(await runBlock(agent, blockEvent2, txEvent2));
+    findings = findings.concat(await runBlock(
+      agent,
+      new TestBlockEvent().setTimestamp(lessThanTenMinutes),
+      new TestTransactionEvent().setTimestamp(lessThanTenMinutes)));
+    findings = findings.concat(await runBlock(
+      agent,
+      new TestBlockEvent().setTimestamp(greaterThanTenMinutes),
+      new TestTransactionEvent().setTimestamp(greaterThanTenMinutes)));
 
     expect(findings).toStrictEqual([]);
   });
