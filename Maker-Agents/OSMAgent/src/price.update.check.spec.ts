@@ -13,13 +13,16 @@ const differentHour = 1467032181; // "Mon, 27 Jun 2016 12:56:21 GMT"
 
 describe("Poker Method", () => {
   let timeTracker: TimeTracker;
-  let handleTransaction: HandleTransaction;
   let handleBlock: HandleBlock;
+  let handleTransaction: HandleTransaction;
+
+  beforeEach(() => {
+    timeTracker = new TimeTracker();
+    handleBlock = providePriceLateChecker(timeTracker);
+    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
+  });
 
   it("should returns empty findings in the first hour", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent = new TestTransactionEvent().setTimestamp(greaterThanTenMinutes);
@@ -32,9 +35,6 @@ describe("Poker Method", () => {
   });
 
   it("should returns empty findings in the first hour", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(lessThanTenMinutes);
@@ -51,9 +51,6 @@ describe("Poker Method", () => {
   });
 
   it("should returns empty findings if the function was correctly called", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
@@ -76,9 +73,6 @@ describe("Poker Method", () => {
   });
 
   it("should returns a finding if the function is not called in that hour", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
@@ -99,9 +93,6 @@ describe("Poker Method", () => {
   });
 
   it("should returns a finding if the function was not called in the first ten minutes", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
@@ -124,9 +115,6 @@ describe("Poker Method", () => {
   });
 
   it("should returns a finding for every hour in which function is not called in the first ten minutes", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
@@ -153,9 +141,6 @@ describe("Poker Method", () => {
   });
 
   it("should report findings only once per hour", async () => {
-    timeTracker = new TimeTracker();
-    handleTransaction = providePriceUpdateCheckHandler(timeTracker);
-    handleBlock = providePriceLateChecker(timeTracker);
     let findings: Finding[] = [];
 
     const txEvent1 = new TestTransactionEvent().setTimestamp(previousHourForActivatingAgent);
