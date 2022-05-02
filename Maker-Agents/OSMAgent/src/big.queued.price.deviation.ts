@@ -50,7 +50,7 @@ const needToReport = (currentValue: BigNumber, nextValue: BigNumber): boolean =>
   return currentValue.sub(nextValue).abs().gt(bigDeviation);
 };
 
-const checkOSMContract = (contractAddress: string, txEvent: TransactionEvent): Finding | null => {
+const checkOSMContract = (name: string, contractAddress: string, txEvent: TransactionEvent): Finding | null => {
   const currentValues: BigNumber[] = getCurrentValues(contractAddress, txEvent);
   const nextValues: BigNumber[] = getNextValuesForOSM(contractAddress, txEvent.traces);
 
@@ -67,14 +67,13 @@ const checkOSMContract = (contractAddress: string, txEvent: TransactionEvent): F
 export default function provideBigQueuedPriceDeviationHandler(fetcher: AddressesFetcher): HandleTransaction {
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
     const findings: Finding[] = [];
-    const contractAddressesList: string[] = Array.from(fetcher.osmContracts.values());
-
-    for (let i = 0; i < contractAddressesList.length; i++) {
-      const finding: Finding | null = checkOSMContract(contractAddressesList[i], txEvent);
+    fetcher.osmContracts.forEach(function(addr, key) {
+      const name = parseBytes32String(key);
+      const finding: Finding | null = checkOSMContract(name, addr, txEvent);
       if (finding !== null) {
         findings.push(finding);
       }
-    }
+    });
     return findings;
   };
 }

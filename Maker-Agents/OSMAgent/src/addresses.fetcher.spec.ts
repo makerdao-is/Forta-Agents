@@ -3,6 +3,15 @@ import { createAddress, MockEthersProvider } from "forta-agent-tools/lib/tests";
 import { CHAIN_LOG, FUNCTIONS_ABIS } from "./utils";
 import { formatBytes32String, Interface } from "ethers/lib/utils";
 
+export const PIP_ONE = formatBytes32String("PIP_ONE");
+export const PIP_TWO = formatBytes32String("PIP_TWO");
+export const PIP_THREE = formatBytes32String("PIP_THREE");
+export const TCONTRACTS: Map<string, string> = new Map<string, string>([
+  [PIP_ONE, createAddress("0xa1")],
+  [PIP_TWO, createAddress("0xa2")],
+  [PIP_THREE, createAddress("0xa3")],
+]);
+
 describe("AddressesFetcher test suite", () => {
   const mockProvider: MockEthersProvider = new MockEthersProvider();
   let fetcher: AddressesFetcher = new AddressesFetcher(mockProvider as any, CHAIN_LOG);

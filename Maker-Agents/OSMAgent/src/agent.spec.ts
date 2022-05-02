@@ -16,12 +16,8 @@ import {
   EVENTS_ABIS,
   CHAIN_LOG,
 } from "./utils";
+import { TCONTRACTS as CONTRACTS, PIP_ONE, PIP_TWO, PIP_THREE } from "./addresses.fetcher.spec";
 
-const CONTRACTS: Map<string, string> = new Map<string, string>([
-  ["PIP_ONE", createAddress("0xa1")],
-  ["PIP_TWO", createAddress("0xa2")],
-  ["PIP_THREE", createAddress("0xa3")],
-]);
 const megaPokerAddress = "0x2417c2762ec12f2696f62cfa5492953b9467dc81";
 
 const pokeFunctionSelector = "0x18178358";
@@ -77,11 +73,11 @@ describe("OSM Agent Test Suite", () => {
     const txEvent3 = new TestTransactionEvent()
       .setTimestamp(greaterThanTenMinutes)
       .addTraces({
-        from: CONTRACTS.get("PIP_TWO") as string,
+        from: CONTRACTS.get(PIP_TWO) as string,
         input: peekFunctionSelector,
         output: peek_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [107]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_TWO") as string, log.data, ...log.topics);
+      .addAnonymousEventLog(CONTRACTS.get(PIP_TWO) as string, log.data, ...log.topics);
     const blockEvent3 = new TestBlockEvent().setTimestamp(greaterThanTenMinutes);
 
     findings = findings.concat(await transactionHandler(txEvent1));
@@ -92,7 +88,7 @@ describe("OSM Agent Test Suite", () => {
     findings = findings.concat(await blockHandler(blockEvent3));
 
     expect(findings).toStrictEqual([
-      deviationFinding(CONTRACTS.get("PIP_TWO") as string, 100, 107),
+      deviationFinding(CONTRACTS.get(PIP_TWO) as string, 100, 107),
       priceUpdateFinding(),
     ]);
   });
@@ -101,7 +97,7 @@ describe("OSM Agent Test Suite", () => {
     let findings: Finding[] = [];
 
     const _from = createAddress("0x5");
-    const _to = CONTRACTS.get("PIP_ONE") as string;
+    const _to = CONTRACTS.get(PIP_ONE) as string;
     const _input: string = relyIface.encodeFunctionData("rely", [createAddress("0x5")]);
 
     const txEvent = new TestTransactionEvent()
@@ -114,14 +110,14 @@ describe("OSM Agent Test Suite", () => {
       .setTimestamp(lessThanTenMinutes);
 
     findings = findings.concat(await transactionHandler(txEvent));
-    expect(findings).toStrictEqual([relyFinding(CONTRACTS.get("PIP_ONE") as string, createAddress("0x5"))]);
+    expect(findings).toStrictEqual([relyFinding(CONTRACTS.get(PIP_ONE) as string, createAddress("0x5"))]);
   });
 
   it("should detect deny function calls", async () => {
     let findings: Finding[] = [];
 
     const _from = createAddress("0x2");
-    const _to = CONTRACTS.get("PIP_ONE") as string;
+    const _to = CONTRACTS.get(PIP_ONE) as string;
     const _input: string = denyIface.encodeFunctionData("deny", [createAddress("0x5")]);
 
     const txEvent = new TestTransactionEvent()
@@ -134,7 +130,7 @@ describe("OSM Agent Test Suite", () => {
       .setTimestamp(lessThanTenMinutes);
 
     findings = findings.concat(await transactionHandler(txEvent));
-    expect(findings).toStrictEqual([denyFinding(CONTRACTS.get("PIP_ONE") as string, createAddress("0x5"))]);
+    expect(findings).toStrictEqual([denyFinding(CONTRACTS.get(PIP_ONE) as string, createAddress("0x5"))]);
   });
 
   it("should detect when poke was not called", async () => {
@@ -159,16 +155,16 @@ describe("OSM Agent Test Suite", () => {
 
     const txEvent = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE") as string,
+        from: CONTRACTS.get(PIP_ONE) as string,
         input: peekFunctionSelector,
         output: peek_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [107]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE") as string, log.data, ...log.topics)
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE) as string, log.data, ...log.topics)
       .setTimestamp(lessThanTenMinutes);
 
     findings = findings.concat(await transactionHandler(txEvent));
 
-    expect(findings).toStrictEqual([deviationFinding(CONTRACTS.get("PIP_ONE") as string, 100, 107)]);
+    expect(findings).toStrictEqual([deviationFinding(CONTRACTS.get(PIP_ONE) as string, 100, 107)]);
   });
 
   it("should not return MakerDAO-OSM-4 finding if poke was already called in that hour", async () => {
@@ -180,15 +176,15 @@ describe("OSM Agent Test Suite", () => {
       .setTimestamp(lessThanTenMinutes);
     const txEvent2 = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE"),
+        from: CONTRACTS.get(PIP_ONE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [107]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE"), log.data, ...log.topics)
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE), log.data, ...log.topics)
       .setTimestamp(greaterThanTenMinutes);
 
     const _from = createAddress("0x2");
-    const _to = CONTRACTS.get("PIP_TWO") as string;
+    const _to = CONTRACTS.get(PIP_TWO) as string;
     const _input: string = denyIface.encodeFunctionData("deny", [createAddress("0x5")]);
 
     const txEvent3 = new TestTransactionEvent()
@@ -205,8 +201,8 @@ describe("OSM Agent Test Suite", () => {
     findings = findings.concat(await transactionHandler(txEvent3));
 
     expect(findings).toStrictEqual([
-      deviationFinding(CONTRACTS.get("PIP_ONE") as string, 100, 107),
-      denyFinding(CONTRACTS.get("PIP_TWO") as string, createAddress("0x5")),
+      deviationFinding(CONTRACTS.get(PIP_ONE) as string, 100, 107),
+      denyFinding(CONTRACTS.get(PIP_TWO) as string, createAddress("0x5")),
     ]);
   });
 
@@ -216,7 +212,7 @@ describe("OSM Agent Test Suite", () => {
       formatBytes32String("PIP_FOUR"),
       createAddress("0x7"),
     ]);
-    const log2 = iface.encodeEventLog(iface.getEvent("RemoveAddress"), [formatBytes32String("PIP_THREE")]);
+    const log2 = iface.encodeEventLog(iface.getEvent("RemoveAddress"), [PIP_THREE]);
 
     const wrongIface = new Interface(["event wrong()"]);
     const log3 = wrongIface.encodeEventLog(wrongIface.getEvent("wrong"), []);

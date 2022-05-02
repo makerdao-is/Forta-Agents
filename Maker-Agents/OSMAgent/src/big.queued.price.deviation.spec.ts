@@ -4,13 +4,10 @@ import { TestTransactionEvent, createAddress } from "forta-agent-tools/lib/tests
 import { utils } from "ethers";
 import { defaultAbiCoder } from "ethers/lib/utils";
 import { LOG_VALUE_EVENT_SIGNATURE, PEEK_ABI, PEEK_FUNCTION_SELECTOR } from "./utils";
+import { formatBytes32String } from "ethers/lib/utils";
+import { TCONTRACTS as CONTRACTS, PIP_ONE, PIP_TWO, PIP_THREE } from "./addresses.fetcher.spec";
 
 const ADDRESSES = [createAddress("0x1"), createAddress("0x2"), createAddress("0x3"), createAddress("0x4")];
-const CONTRACTS: Map<string, string> = new Map<string, string>([
-  ["PIP_ONE", createAddress("0xa1")],
-  ["PIP_TWO", createAddress("0xa2")],
-  ["PIP_THREE", createAddress("0xa3")],
-]);
 
 const logIface = new utils.Interface([LOG_VALUE_EVENT_SIGNATURE]);
 
@@ -39,15 +36,15 @@ describe("Big deviation queued price Tests", () => {
 
     const txEvent: TransactionEvent = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE"),
+        from: CONTRACTS.get(PIP_ONE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [107]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE"), log.data, ...log.topics);
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE), log.data, ...log.topics);
 
     const findings: Finding[] = await handleTransaction(txEvent);
 
-    expect(findings).toStrictEqual([createFinding(CONTRACTS.get("PIP_ONE") as string, 100, 107)]);
+    expect(findings).toStrictEqual([createFinding(CONTRACTS.get(PIP_ONE) as string, 100, 107)]);
   });
 
   it("should return an empty finding if the new price doesn't deviate too much", async () => {
@@ -55,11 +52,11 @@ describe("Big deviation queued price Tests", () => {
 
     const txEvent: TransactionEvent = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE"),
+        from: CONTRACTS.get(PIP_ONE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [105]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE"), log.data, ...log.topics);
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE), log.data, ...log.topics);
 
     const findings: Finding[] = await handleTransaction(txEvent);
 
@@ -75,7 +72,7 @@ describe("Big deviation queued price Tests", () => {
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [200]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE"), log.data, ...log.topics);
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE), log.data, ...log.topics);
 
     const findings: Finding[] = await handleTransaction(txEvent);
 
@@ -84,7 +81,7 @@ describe("Big deviation queued price Tests", () => {
 
   it("should return an empty finding if Peek function wasn't called", async () => {
     const txEvent: TransactionEvent = new TestTransactionEvent().addTraces({
-      from: CONTRACTS.get("PIP_ONE"),
+      from: CONTRACTS.get(PIP_ONE),
       input: "0x11111111",
       output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [108]), true]),
     });
@@ -96,7 +93,7 @@ describe("Big deviation queued price Tests", () => {
 
   it("should return an empty finding if the Peek call wasn't successful", async () => {
     const txEvent: TransactionEvent = new TestTransactionEvent().addTraces({
-      from: CONTRACTS.get("PIP_ONE"),
+      from: CONTRACTS.get(PIP_ONE),
       input: PEEK_FUNCTION_SELECTOR,
       output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [108]), false]),
     });
@@ -112,7 +109,7 @@ describe("Big deviation queued price Tests", () => {
 
     const txEvent: TransactionEvent = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE"),
+        from: CONTRACTS.get(PIP_ONE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [108]), true]),
       })
@@ -130,23 +127,23 @@ describe("Big deviation queued price Tests", () => {
 
     const txEvent: TransactionEvent = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE"),
+        from: CONTRACTS.get(PIP_ONE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [108]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE"), log1.data, ...log1.topics)
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE), log1.data, ...log1.topics)
       .addTraces({
-        from: CONTRACTS.get("PIP_TWO"),
+        from: CONTRACTS.get(PIP_TWO),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [118]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_TWO"), log2.data, ...log2.topics);
+      .addAnonymousEventLog(CONTRACTS.get(PIP_TWO), log2.data, ...log2.topics);
 
     const findings: Finding[] = await handleTransaction(txEvent);
 
     expect(findings).toStrictEqual([
-      createFinding(CONTRACTS.get("PIP_ONE") as string, 100, 108),
-      createFinding(CONTRACTS.get("PIP_TWO") as string, 90, 118),
+      createFinding(CONTRACTS.get(PIP_ONE) as string, 100, 108),
+      createFinding(CONTRACTS.get(PIP_TWO) as string, 90, 118),
     ]);
   });
 
@@ -156,25 +153,25 @@ describe("Big deviation queued price Tests", () => {
     const log3 = logIface.encodeEventLog(logIface.getEvent("LogValue"), [defaultAbiCoder.encode(["uint256"], [100])]);
     const txEvent: TransactionEvent = new TestTransactionEvent()
       .addTraces({
-        from: CONTRACTS.get("PIP_ONE"),
+        from: CONTRACTS.get(PIP_ONE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [108]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_ONE"), log1.data, ...log1.topics)
+      .addAnonymousEventLog(CONTRACTS.get(PIP_ONE), log1.data, ...log1.topics)
       .addTraces({
-        from: CONTRACTS.get("PIP_TWO"),
+        from: CONTRACTS.get(PIP_TWO),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [118]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_TWO"), log2.data, ...log2.topics)
+      .addAnonymousEventLog(CONTRACTS.get(PIP_TWO), log2.data, ...log2.topics)
       .addTraces({
-        from: CONTRACTS.get("PIP_TWO"),
+        from: CONTRACTS.get(PIP_TWO),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [105]), true]),
       })
-      .addAnonymousEventLog(CONTRACTS.get("PIP_THREE"), log3.data, ...log3.topics)
+      .addAnonymousEventLog(CONTRACTS.get(PIP_THREE), log3.data, ...log3.topics)
       .addTraces({
-        from: CONTRACTS.get("PIP_THREE"),
+        from: CONTRACTS.get(PIP_THREE),
         input: PEEK_FUNCTION_SELECTOR,
         output: PEEK_ABI.encodeFunctionResult("peek", [defaultAbiCoder.encode(["uint256"], [101]), false]),
       });
@@ -182,8 +179,8 @@ describe("Big deviation queued price Tests", () => {
     const findings: Finding[] = await handleTransaction(txEvent);
 
     expect(findings).toStrictEqual([
-      createFinding(CONTRACTS.get("PIP_ONE") as string, 100, 108),
-      createFinding(CONTRACTS.get("PIP_TWO") as string, 90, 118),
+      createFinding(CONTRACTS.get(PIP_ONE) as string, 100, 108),
+      createFinding(CONTRACTS.get(PIP_TWO) as string, 90, 118),
     ]);
   });
 });
