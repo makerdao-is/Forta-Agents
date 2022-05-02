@@ -19,6 +19,9 @@ export default class TimeTracker {
   }
 
   updateFunctionWasCalled(status: boolean): void {
+    if (this.functionWasCalled !== status) {
+      console.log(`updateFunctionWasCalled ${this.hour} ${this.firstHour} ${status} ${this.findingReported}`);
+    }
     this.functionWasCalled = status;
   }
 
@@ -47,6 +50,7 @@ export default class TimeTracker {
 
   updateHour(timestamp: number): void {
     if (this.isDifferentHour(timestamp)) {
+      console.log(`updateHour ${this.hour} ${this.firstHour} ${this.functionWasCalled} ${this.findingReported}`)
       this.updateFindingReport(false);
       this.updateFunctionWasCalled(false);
     }

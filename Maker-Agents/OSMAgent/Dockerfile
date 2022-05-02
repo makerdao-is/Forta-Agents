@@ -11,5 +11,6 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=builder /app/dist ./src
 COPY package*.json ./
+LABEL "network.forta.settings.agent-logs.enable"="true"
 RUN npm ci --production
 CMD [ "npm", "run", "start:prod" ]
