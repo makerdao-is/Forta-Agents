@@ -4,7 +4,6 @@ import { TestTransactionEvent, createAddress } from "forta-agent-tools/lib/tests
 import { utils } from "ethers";
 import { defaultAbiCoder } from "ethers/lib/utils";
 import { LOG_VALUE_EVENT_SIGNATURE, PEEK_ABI, PEEK_FUNCTION_SELECTOR } from "./utils";
-import { formatBytes32String } from "ethers/lib/utils";
 import { TCONTRACTS as CONTRACTS, PIP_ONE, PIP_TWO, PIP_THREE } from "./addresses.fetcher.spec";
 
 const ADDRESSES = [createAddress("0x1"), createAddress("0x2"), createAddress("0x3"), createAddress("0x4")];
@@ -44,7 +43,7 @@ describe("Big deviation queued price Tests", () => {
 
     const findings: Finding[] = await handleTransaction(txEvent);
 
-    expect(findings).toStrictEqual([createFinding(CONTRACTS.get(PIP_ONE) as string, 100, 107)]);
+    expect(findings).toStrictEqual([createFinding("PIP_ONE", CONTRACTS.get(PIP_ONE) as string, 100, 107)]);
   });
 
   it("should return an empty finding if the new price doesn't deviate too much", async () => {
@@ -142,8 +141,8 @@ describe("Big deviation queued price Tests", () => {
     const findings: Finding[] = await handleTransaction(txEvent);
 
     expect(findings).toStrictEqual([
-      createFinding(CONTRACTS.get(PIP_ONE) as string, 100, 108),
-      createFinding(CONTRACTS.get(PIP_TWO) as string, 90, 118),
+      createFinding("PIP_ONE", CONTRACTS.get(PIP_ONE) as string, 100, 108),
+      createFinding("PIP_TWO", CONTRACTS.get(PIP_TWO) as string, 90, 118),
     ]);
   });
 
@@ -179,8 +178,8 @@ describe("Big deviation queued price Tests", () => {
     const findings: Finding[] = await handleTransaction(txEvent);
 
     expect(findings).toStrictEqual([
-      createFinding(CONTRACTS.get(PIP_ONE) as string, 100, 108),
-      createFinding(CONTRACTS.get(PIP_TWO) as string, 90, 118),
+      createFinding("PIP_ONE", CONTRACTS.get(PIP_ONE) as string, 100, 108),
+      createFinding("PIP_TWO", CONTRACTS.get(PIP_TWO) as string, 90, 118),
     ]);
   });
 });

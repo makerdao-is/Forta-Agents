@@ -88,7 +88,7 @@ describe("OSM Agent Test Suite", () => {
     findings = findings.concat(await blockHandler(blockEvent3));
 
     expect(findings).toStrictEqual([
-      deviationFinding(CONTRACTS.get(PIP_TWO) as string, 100, 107),
+      deviationFinding("PIP_TWO", CONTRACTS.get(PIP_TWO) as string, 100, 107),
       priceUpdateFinding(),
     ]);
   });
@@ -164,7 +164,7 @@ describe("OSM Agent Test Suite", () => {
 
     findings = findings.concat(await transactionHandler(txEvent));
 
-    expect(findings).toStrictEqual([deviationFinding(CONTRACTS.get(PIP_ONE) as string, 100, 107)]);
+    expect(findings).toStrictEqual([deviationFinding("PIP_ONE", CONTRACTS.get(PIP_ONE) as string, 100, 107)]);
   });
 
   it("should not return MakerDAO-OSM-4 finding if poke was already called in that hour", async () => {
@@ -201,7 +201,7 @@ describe("OSM Agent Test Suite", () => {
     findings = findings.concat(await transactionHandler(txEvent3));
 
     expect(findings).toStrictEqual([
-      deviationFinding(CONTRACTS.get(PIP_ONE) as string, 100, 107),
+      deviationFinding("PIP_ONE", CONTRACTS.get(PIP_ONE) as string, 100, 107),
       denyFinding(CONTRACTS.get(PIP_TWO) as string, createAddress("0x5")),
     ]);
   });

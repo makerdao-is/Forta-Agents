@@ -4,7 +4,7 @@ import { TransactionEvent, Trace, HandleTransaction, Finding, FindingType, Findi
 import AddressesFetcher from "./addresses.fetcher";
 import { PEEK_FUNCTION_SELECTOR, LOG_VALUE_EVENT_SIGNATURE, PEEK_ABI } from "./utils";
 
-export const createFinding = (contractAddress: string, currentPrice: any, queuedPrice: any): Finding => {
+export const createFinding = (contractName: string, contractAddress: string, currentPrice: any, queuedPrice: any): Finding => {
   return Finding.fromObject({
     name: "MakerDAO OSM Contract Big Enqueued Price Deviation",
     description: "The new enqueued price deviate more than 6% from current price",
@@ -13,6 +13,7 @@ export const createFinding = (contractAddress: string, currentPrice: any, queued
     severity: FindingSeverity.Info,
     protocol: "Maker",
     metadata: {
+      contractName: contractName,
       contractAddress: contractAddress,
       currentPrice: currentPrice.toString(),
       queuedPrice: queuedPrice.toString(),
@@ -57,7 +58,7 @@ const checkOSMContract = (name: string, contractAddress: string, txEvent: Transa
   const lessLength: number = Math.min(currentValues.length, nextValues.length);
   for (let i = 0; i < lessLength; i++) {
     if (needToReport(currentValues[i], nextValues[i])) {
-      return createFinding(contractAddress.toLowerCase(), currentValues[i], nextValues[i]);
+      return createFinding(name, contractAddress.toLowerCase(), currentValues[i], nextValues[i]);
     }
   }
 
