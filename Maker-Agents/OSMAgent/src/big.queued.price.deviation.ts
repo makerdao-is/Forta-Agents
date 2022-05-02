@@ -19,7 +19,7 @@ export const createFinding = (contractName: string, contractAddress: string, cur
       contractAddress: contractAddress,
       currentPrice: currentPrice.toString(),
       queuedPrice: queuedPrice.toString(),
-      change: que.div(cur).toString()
+      change: que.mul(10000).div(cur).toString()
     },
   });
 };
