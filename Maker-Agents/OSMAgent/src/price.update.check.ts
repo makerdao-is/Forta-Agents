@@ -1,5 +1,7 @@
-import { Finding, HandleTransaction, TransactionEvent, HandleBlock, BlockEvent,
-         FindingSeverity, FindingType } from "forta-agent";
+import {
+  Finding, HandleTransaction, TransactionEvent, HandleBlock, BlockEvent,
+  FindingSeverity, FindingType
+} from "forta-agent";
 import TimeTracker from "./time.tracker";
 import { MEGAPOKER_CONTRACT, POKE_FUNCTION_SIG } from "./utils";
 
@@ -22,6 +24,7 @@ export function providePriceUpdateCheckHandler(timeTracker: TimeTracker): Handle
     const timestamp = txEvent.block.timestamp;
 
     if (
+      !timeTracker.functionWasCalled &&
       timeTracker.isInFirstTenMins(timestamp) &&
       txEvent.filterFunction(POKE_FUNCTION_SIG, MEGAPOKER_CONTRACT).length !== 0
     ) {
