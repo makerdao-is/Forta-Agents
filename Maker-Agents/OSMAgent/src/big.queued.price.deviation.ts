@@ -5,6 +5,8 @@ import AddressesFetcher from "./addresses.fetcher";
 import { PEEK_FUNCTION_SELECTOR, LOG_VALUE_EVENT_SIGNATURE, PEEK_ABI } from "./utils";
 
 export const createFinding = (contractName: string, contractAddress: string, currentPrice: any, queuedPrice: any): Finding => {
+  const cur = BigNumber.from(currentPrice);
+  const que = BigNumber.from(queuedPrice);
   return Finding.fromObject({
     name: "MakerDAO OSM Contract Big Enqueued Price Deviation",
     description: "The new enqueued price deviate more than 6% from current price",
@@ -17,6 +19,7 @@ export const createFinding = (contractName: string, contractAddress: string, cur
       contractAddress: contractAddress,
       currentPrice: currentPrice.toString(),
       queuedPrice: queuedPrice.toString(),
+      change: que.div(cur).toString()
     },
   });
 };
