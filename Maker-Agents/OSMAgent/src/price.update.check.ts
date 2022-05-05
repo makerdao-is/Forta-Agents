@@ -40,7 +40,7 @@ export function providePriceLateChecker(timeTracker: TimeTracker): HandleBlock {
     let findings: Finding[] = [];
     const timestamp = blockEvent.block.timestamp;
 
-    timeTracker.updateHour(timestamp);
+    timeTracker.updateHour(blockEvent);
 
     if (
       !timeTracker.isInFirstTenMins(timestamp) &&

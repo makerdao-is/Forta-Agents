@@ -1,3 +1,5 @@
+import { BlockEvent } from "forta-agent";
+
 export default class TimeTracker {
   private hour: number; // keeps track of the hour
   private firstHour: number;
@@ -48,9 +50,10 @@ export default class TimeTracker {
     return this.firstHour === -1 || this.firstHour === this.getHour(timestamp);
   }
 
-  updateHour(timestamp: number): void {
+  updateHour(blockEvent: BlockEvent): void {
+    const timestamp = blockEvent.block.timestamp;
     if (this.isDifferentHour(timestamp)) {
-      console.log(`updateHour ${this.hour} ${this.firstHour} ${this.functionWasCalled} ${this.findingReported}`)
+      console.log(`updateHour ${blockEvent.blockNumber} ${blockEvent.blockHash} ${this.hour} ${this.firstHour} ${this.functionWasCalled} ${this.findingReported}`)
       this.updateFindingReport(false);
       this.updateFunctionWasCalled(false);
     }
