@@ -1,5 +1,8 @@
-import { Finding, getEthersProvider, HandleTransaction, HandleBlock,
-         TransactionEvent, BlockEvent } from "forta-agent";
+import {
+  Finding, getEthersProvider, HandleTransaction, HandleBlock,
+  TransactionEvent, BlockEvent
+} from "forta-agent";
+import { providers } from "ethers";
 import provideDenyFunctionHandler from "./deny.function";
 import provideRelyFunctionHandler from "./rely.function";
 import TimeTracker from "./time.tracker";
@@ -18,7 +21,7 @@ export const initialize = (fetcher: AddressesFetcher) => async () => {
 };
 
 export const provideHandleTxn = (fetcher: AddressesFetcher,
-                                    timeTracker: TimeTracker): HandleTransaction => {
+  timeTracker: TimeTracker): HandleTransaction => {
   const bigDeviationNextPriceHandler: HandleTransaction = provideBigQueuedPriceDeviationHandler(fetcher);
   const denyFunctionHandler: HandleTransaction = provideDenyFunctionHandler(fetcher);
   const relyFunctionHandler: HandleTransaction = provideRelyFunctionHandler(fetcher);
@@ -42,9 +45,11 @@ export const provideHandleTxn = (fetcher: AddressesFetcher,
   };
 };
 
-export const provideHandleBlock = (timeTracker: TimeTracker): HandleBlock => {
+export const provideHandleBlock = (provider: providers.Provider,
+  fetcher: AddressesFetcher,
+  timeTracker: TimeTracker): HandleBlock => {
   return async (blockEvent: BlockEvent): Promise<Finding[]> => {
-    const handler: HandleBlock = providePriceLateChecker(timeTracker);
+    const handler: HandleBlock = providePriceLateChecker(provider, fetcher, timeTracker);
     return handler(blockEvent);
   };
 };
@@ -52,5 +57,5 @@ export const provideHandleBlock = (timeTracker: TimeTracker): HandleBlock => {
 export default {
   initialize: initialize(FETCHER),
   handleTransaction: provideHandleTxn(FETCHER, TIMETRACKER),
-  handleBlock: provideHandleBlock(TIMETRACKER),
+  handleBlock: provideHandleBlock(getEthersProvider(), FETCHER, TIMETRACKER),
 };

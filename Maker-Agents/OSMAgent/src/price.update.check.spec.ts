@@ -3,22 +3,33 @@ import TimeTracker from "./time.tracker";
 import { providePriceUpdateCheckHandler, providePriceLateChecker, createFinding } from "./price.update.check";
 
 import { Agent, runBlock, TestTransactionEvent, TestBlockEvent } from "forta-agent-tools/lib/tests";
+import { MockEthersProvider } from "forta-agent-tools/lib/tests";
 import { MEGAPOKER_CONTRACT } from "./utils";
+import { TCONTRACTS as CONTRACTS } from "./addresses.fetcher.spec";
 
 const pokeFunctionSelector = "0x18178358";
 const previousHourForActivatingAgent = 1467018381;
 const lessThanTenMinutes = 1467021981; // "Mon, 27 Jun 2016 10:06:21 GMT"
 const greaterThanTenMinutes = 1467022981; // "Mon, 27 Jun 2016 10:23:01 GMT"
 const differentHour = 1467032181; // "Mon, 27 Jun 2016 12:56:21 GMT"
+const mockProvider: MockEthersProvider = new MockEthersProvider();
 
 describe("Poker Method", () => {
   let timeTracker: TimeTracker;
   let agent: Agent;
+  let mockFetcher: any;
+  let updateAddresses = jest.fn();
+  let getOsmAddresses = jest.fn();
 
   beforeEach(() => {
+    mockFetcher = {
+      osmContracts: CONTRACTS,
+      getOsmAddresses,
+      updateAddresses,
+    };
     timeTracker = new TimeTracker();
     agent = {
-      handleBlock: providePriceLateChecker(timeTracker),
+      handleBlock: providePriceLateChecker(mockProvider as any, mockFetcher, timeTracker),
       handleTransaction: providePriceUpdateCheckHandler(timeTracker),
     };
   });

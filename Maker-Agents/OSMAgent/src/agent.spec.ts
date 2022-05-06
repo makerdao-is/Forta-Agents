@@ -1,6 +1,6 @@
 import { Finding, HandleTransaction, HandleBlock } from "forta-agent";
 import { provideHandleTxn, provideHandleBlock } from "./agent";
-import { createAddress, TestTransactionEvent, TestBlockEvent } from "forta-agent-tools/lib/tests";
+import { createAddress, TestTransactionEvent, TestBlockEvent, MockEthersProvider } from "forta-agent-tools/lib/tests";
 import { createFinding as deviationFinding } from "./big.queued.price.deviation";
 import TimeTracker from "./time.tracker";
 import { createFinding as priceUpdateFinding } from "./price.update.check";
@@ -27,6 +27,7 @@ const previousHourForActivatingAgent = 1467018381;
 const lessThanTenMinutes = 1467021981; // "Mon, 27 Jun 2016 10:06:21 GMT"
 const greaterThanTenMinutes = 1467022981; // "Mon, 27 Jun 2016 10:23:01 GMT"
 
+const mockProvider: MockEthersProvider = new MockEthersProvider();
 const peek_ABI = new utils.Interface(["function peek() public view returns (bytes32, bool)"]);
 const logIface = new utils.Interface(["event LogValue(bytes32 val)"]);
 const relyIface = new utils.Interface([RELY_FUNCTION_SIG]);
@@ -49,7 +50,7 @@ describe("OSM Agent Test Suite", () => {
   beforeEach(() => {
     timeTracker = new TimeTracker();
     transactionHandler = provideHandleTxn(mockFetcher, timeTracker);
-    blockHandler = provideHandleBlock(timeTracker);
+    blockHandler = provideHandleBlock(mockProvider as any, mockFetcher, timeTracker);
   });
 
   it("should return empty findings is not expected events happens", async () => {
