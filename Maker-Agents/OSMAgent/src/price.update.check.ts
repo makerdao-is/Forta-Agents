@@ -5,7 +5,7 @@ import {
   FindingSeverity, FindingType
 } from "forta-agent";
 import TimeTracker from "./time.tracker";
-import { MEGAPOKER_CONTRACT, POKE_FUNCTION_SIG } from "./utils";
+import { MEGAPOKER_CONTRACT, POKE_FUNCTION_SIG, pokeFunctionSelector } from "./utils";
 import { formatBytes32String } from "ethers/lib/utils";
 import type AddressesFetcher from "./addresses.fetcher";
 
@@ -62,18 +62,11 @@ export function providePriceLateChecker(
         address: PIP_ETH,
         fromBlock: fromBlock,
         toBlock: toBlock,
-        topics: [ // keccak 'poke()'
-          "0x1817835800000000000000000000000000000000000000000000000000000000"
-        ]
+        topics: [pokeFunctionSelector]
       };
 
-      // MockEthersProvider doesn't offer getLogs() TODO
-      let logs: Array<Log> = [];
-      if (typeof provider.getLogs === "function")
-        logs = await provider.getLogs(filter);
+      const logs = await provider.getLogs(filter);
       const called = logs.length > 0;
-      console.log(`Search poke in ${PIP_ETH} in ${fromBlock}-${toBlock} ` +
-        `-> ${called} (otherwise ${timeTracker.functionWasCalled})`);
       if (called) timeTracker.updateFunctionWasCalled(true);
     }
 

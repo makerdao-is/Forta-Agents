@@ -15,12 +15,12 @@ import {
   PEEK_ABI,
   EVENTS_ABIS,
   CHAIN_LOG,
+  pokeFunctionSelector,
 } from "./utils";
 import { TCONTRACTS as CONTRACTS, PIP_ONE, PIP_TWO, PIP_THREE } from "./addresses.fetcher.spec";
 
 const megaPokerAddress = "0x2417c2762ec12f2696f62cfa5492953b9467dc81";
 
-const pokeFunctionSelector = "0x18178358";
 const peekFunctionSelector = "0x59e02dd7";
 
 const previousHourForActivatingAgent = 1467018381;
@@ -32,6 +32,11 @@ const peek_ABI = new utils.Interface(["function peek() public view returns (byte
 const logIface = new utils.Interface(["event LogValue(bytes32 val)"]);
 const relyIface = new utils.Interface([RELY_FUNCTION_SIG]);
 const denyIface = new utils.Interface([DENY_FUNCTION_SIG]);
+
+mockProvider.addFilteredLogs({
+  fromBlock: -51, toBlock: -1,
+  topics: [pokeFunctionSelector]
+}, []);
 
 describe("OSM Agent Test Suite", () => {
   let timeTracker: TimeTracker;

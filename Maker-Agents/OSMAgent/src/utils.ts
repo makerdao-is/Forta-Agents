@@ -16,6 +16,7 @@ export const DENY_FUNCTION_SIG = "function deny(address)";
 
 export const MEGAPOKER_CONTRACT = "0x27a25935D8b0006A97E11cAdDc2b3bf3a6721c13";
 export const POKE_FUNCTION_SIG = "function poke()";
+export const pokeFunctionSelector = "0x1817835800000000000000000000000000000000000000000000000000000000"; // keccak 'poke()'
 
 export const PEEK_FUNCTION_SELECTOR = "0x59e02dd7";
 export const LOG_VALUE_EVENT_SIGNATURE = "event LogValue(bytes32)";
