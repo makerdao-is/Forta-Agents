@@ -14,7 +14,7 @@ export const RELY_FUNCTION_SIG = "function rely(address)";
 
 export const DENY_FUNCTION_SIG = "function deny(address)";
 
-export const MEGAPOKER_CONTRACT = "0x27a25935D8b0006A97E11cAdDc2b3bf3a6721c13";
+export const MEGAPOKER_CONTRACT = "0xb440E51E834bb2b3fee1a4517a4DB17bbdF588c6";
 export const POKE_FUNCTION_SIG = "function poke()";
 export const pokeFunctionSelector = "0x1817835800000000000000000000000000000000000000000000000000000000"; // keccak 'poke()'
 
