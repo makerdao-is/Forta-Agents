@@ -41,12 +41,12 @@ export const provideHatChecker = (
     const previousHat = await fetcher.getHat(block - 1);
     const hat: string = await fetcher.getHat(block);
 
-    // Check if hat address is a known address
-    if (!isKnown(hat)) {
-      findings.push(createFinding(alertId, HatFinding.UnknownHat, { hat: hat.toLowerCase() }));
-    } else {
-      // Compare with previous hat address
-      if (hat !== previousHat) {
+    // Compare with previous hat address
+    if (hat !== previousHat) {
+      // Check if hat address is a known address
+      if (!isKnown(hat)) {
+        findings.push(createFinding(alertId, HatFinding.UnknownHat, { hat: hat.toLowerCase() }));
+      } else {
         findings.push(
           createFinding(alertId, HatFinding.HatModified, {
             hat: hat.toLowerCase(),
