@@ -27,15 +27,15 @@
     "forta-agent": "^0.1.6"
   },
   "devDependencies": {
-    "forta-agent-tools": "^2.0.6",
-    "@types/jest": "^27.0.1",
+    "@types/jest": "^27.5.2",
     "@types/jest-when": "^2.7.3",
-    "jest-when": "^3.4.2",
     "@types/nodemon": "^1.19.0",
-    "jest": "^27.0.6",
+    "forta-agent-tools": "^2.0.6",
+    "jest": "^27.5.1",
+    "jest-when": "^3.4.2",
     "nodemon": "^2.0.8",
     "prettier": "^2.6.0",
-    "ts-jest": "^27.0.3",
-    "typescript": "^4.3.4"
+    "ts-jest": "^27.1.5",
+    "typescript": "^4.7.4"
   }
 }
