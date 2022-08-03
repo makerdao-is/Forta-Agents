@@ -22,7 +22,7 @@ describe("Poker Method w/ Reorg", () => {
     topics: [pokeFunctionSelector], transactionHash: "fake", logIndex: 1
   };
   mockProvider.addFilteredLogs({
-    fromBlock: -51, toBlock: -1,
+    fromBlock: -5, toBlock: -1,
     topics: [pokeFunctionSelector]
   }, [log1]);
 

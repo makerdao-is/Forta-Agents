@@ -75,8 +75,7 @@ export default class TimeTracker {
     const timestamp = blockEvent.block.timestamp;
     if (this.isDifferentHour(timestamp)) {
       this.gotHourBlock = false;
-      const minutes = this.getMinute(timestamp);
-      if (minutes < 2) {
+      if (this.inTopOfHour(timestamp)) {
         this.gotHourBlock = true;
         this.hourBlock = blockEvent.block.number;
       }
